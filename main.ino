@@ -1,6 +1,6 @@
 #include <MotorControl.h>
 #include <Vehicle.h>
-
+#include <Sensor.h>
 
 /*
 SparkFun Inventor’s Kit
@@ -49,6 +49,9 @@ float upDistance = 0;            //variable to store the distance measured by th
 int backupTime = 300;           //amount of time that the robot will back up when it senses an object
 int turnTime = 200;             //amount that the robot will turn once it has backed up
 
+Sensor forwardSensor(FRONT_TRIG_PIN, FRONT_ECHO_PIN);
+Sensor upSensor(UP_TRIG_PIN, UP_ECHO_PIN);
+
 Motor right(AIN1, AIN2, PWMA);
 Motor left(BIN1, BIN2, PWMB);
 Vehicle marco(left, right);
@@ -82,8 +85,8 @@ void setup()
 void loop()
 {
   //DETECT THE DISTANCE READ BY THE DISTANCE SENSOR
-  frontDistance = getFrontDistance();
-  upDistance = getUpDistance();
+  frontDistance = forwardSensor.getDistance();
+  upDistance = upSensor.getDistance();
 
   if(digitalRead(switchPin) == LOW){  //if the on switch is flipped
 
@@ -93,28 +96,15 @@ void loop()
       Serial.print("BACK!");
 
       //stop for a moment
-//      rightMotor(0);
-//      leftMotor(0);
-//      delay(200);
       marco.stop();
       delay(200);
 
       //back up
-//      rightMotor(-255);
-//      leftMotor(-255);
-//      delay(backupTime);
       marco.backward(255, backupTime);
-
-      //turn away from obsticle 
-//      rightMotor(255);
-//      leftMotor(-255);    
-//      delay(turnTime);
-//      marco.right(255, turnTime);
 
     }else{                         //if no obstacle is detected drive forward
       Serial.print(" ");
       Serial.print("Moving...");
-
 
       marco.forward(255);
     }
@@ -126,64 +116,3 @@ void loop()
 
   delay(50);                      //wait 50 milliseconds between readings
 }
-
-void runMotor(int motorSpeed, int in1, int in2, int pwm) {
-  if (motorSpeed > 0)                                 //if the motor should drive forward (positive speed)
-  {
-    digitalWrite(in1, HIGH);                         //set pin 1 to high
-    digitalWrite(in2, LOW);                          //set pin 2 to low
-  }
-  else if (motorSpeed < 0)                            //if the motor should drive backwar (negative speed)
-  {
-    digitalWrite(in1, LOW);                          //set pin 1 to low
-    digitalWrite(in2, HIGH);                         //set pin 2 to high
-  }
-  else                                                //if the motor should stop
-  {
-    digitalWrite(in1, LOW);                          //set pin 1 to low
-    digitalWrite(in2, LOW);                          //set pin 2 to low
-  }
-  analogWrite(pwm, abs(motorSpeed));                 //now that the motor direction is set, drive it at the entered speed
-}
-
-/********************************************************************************/
-void rightMotor(int motorSpeed)                       //function for driving the right motor
-{
-  runMotor(motorSpeed, AIN1, AIN2, PWMA);
-}
-
-/********************************************************************************/
-void leftMotor(int motorSpeed)                        //function for driving the left motor
-{
-  runMotor(motorSpeed, BIN1, BIN2, PWMB);
-}
-
-/********************************************************************************/
-//RETURNS THE DISTANCE MEASURED BY THE HC-SR04 DISTANCE SENSOR
-float getDistance(int trigPin, int echoPin)
-{
-  float echoTime;                   //variable to store the time it takes for a ping to bounce off an object
-  float calcualtedDistance;         //variable to store the distance calculated from the echo time
-
-  //send out an ultrasonic pulse that's 10ms long
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10); 
-  digitalWrite(trigPin, LOW);
-
-  echoTime = pulseIn(echoPin, HIGH);      //use the pulsein command to see how long it takes for the
-                                          //pulse to bounce back to the sensor
-
-  calcualtedDistance = echoTime / 148.0;  //calculate the distance of the object that reflected the pulse (half the bounce time multiplied by the speed of sound)
-
-  return calcualtedDistance;              //send back the distance that was calculated
-}
-
-float getFrontDistance() {
-  return getDistance(FRONT_TRIG_PIN, FRONT_ECHO_PIN);
-}
-
-float getUpDistance() {
-  return getDistance(UP_TRIG_PIN, UP_ECHO_PIN);
-}
-
-
