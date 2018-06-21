@@ -15,6 +15,7 @@ public:
 	void right(int speed, int duration=Vehicle::DURATION_INFINITY) const;
 	void left(int speed, int duration=Vehicle::DURATION_INFINITY) const;
 	void stop() const;
+	void turnBack() const;
 
 private:
 	void stopAfterDuration(int duration) const;

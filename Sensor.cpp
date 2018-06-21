@@ -20,6 +20,6 @@ float Sensor::getDistance() const {
                                           //pulse to bounce back to the sensor
 
   calcualtedDistance = echoTime / 148.0;  //calculate the distance of the object that reflected the pulse (half the bounce time multiplied by the speed of sound)
-
+  calcualtedDistance = calcualtedDistance*2.71;
   return calcualtedDistance;              //send back the distance that was calculated
 }

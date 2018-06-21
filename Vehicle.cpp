@@ -2,6 +2,9 @@
 #include "Vehicle.h"
 
 const int Vehicle::DURATION_INFINITY = -1;
+const int backupTime = 300;           //amount of time that the robot will back up when it senses an object
+const int turnTime = 1000;             //amount that the robot will turn once it has backed up
+
 
 Vehicle::Vehicle(const Motor& leftMotor, const Motor& rightMotor) :
 	m_leftMotor(leftMotor),
@@ -43,4 +46,14 @@ void Vehicle::stopAfterDuration(int duration) const {
 void Vehicle::stop() const {
 		m_rightMotor.stop();
 		m_leftMotor.stop();
+}
+
+void Vehicle::turnBack() const {
+	stop();
+  delay(500);
+	backward(255,backupTime);
+  right(255,turnTime);
+  stop();
+  delay(500);
+  forward(255);
 }
